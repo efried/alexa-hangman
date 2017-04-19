@@ -1,0 +1,6 @@
+CheckLetterIntent is there a {letter}
+CheckLetterIntent check for a {letter}
+CheckLetterIntent check for {letter}
+CheckLetterIntent is there {letter}
+CheckLetterIntent are there any {letter}'s
+CheckLetterIntent check for any {letter}'s

@@ -1,0 +1,19 @@
+{
+  "name": "alexa-hangman-test",
+  "version": "1.0.0",
+  "description": "Alexa hangman sample skill",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "hangman",
+    "alexa",
+    "skill",
+    "game"
+  ],
+  "author": "Evan Friedenberg",
+  "dependencies": {
+    "alexa-sdk": "^1.0.8"
+  }
+}
