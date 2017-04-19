@@ -147,7 +147,7 @@ function setLetterPresentMessage(indices) {
     } else {
     	output = letterPresentMoreThanOne;
 		for (var i of indices) {
-			output += i + ',';
+			output += i + ', ';
 		}
     }
 }
