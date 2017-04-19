@@ -5,11 +5,11 @@ var Alexa = require('alexa-sdk');
 var APP_ID = undefined;
 
 //CONSTANTS
-var letterNotPresent = 'I\'m sorry, that letter is not in there';
-var letterPresent = 'That letter is in location ';
+var letterNotPresent = 'That letter is not in there';
+var letterPresent = 'That letter is in location: ';
 var letterPresentMoreThanOne = 'That letter is in the following spots: ';
 var victory = 'Congratulations, you got the word ';
-var loss = 'Sorry, you got guessed too many incorrect letters. The word was: ';
+var loss = 'You guessed too many incorrect letters. The word was: ';
 var MAX_INCORRECT = 6;
 
 var randomWord = 'potato';
