@@ -4,3 +4,8 @@ CheckLetterIntent check for {letter}
 CheckLetterIntent is there {letter}
 CheckLetterIntent are there any {letter}'s
 CheckLetterIntent check for any {letter}'s
+
+CheckGuessIntent is the word {sample|wordGuess}
+CheckGuessIntent is it {sample|wordGuess}
+CheckGuessIntent check if it is {sample|wordGuess}
+CheckGuessIntent check if it's {sample|wordGuess}

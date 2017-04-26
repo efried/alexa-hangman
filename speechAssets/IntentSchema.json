@@ -9,7 +9,13 @@
     		}
     	]
     },{
-    	"intent": "CheckGuessIntent"
+    	"intent": "CheckGuessIntent",
+			"slots":[
+				{
+					"name": "wordGuess",
+					"type": "AMAZON.LITERAL"
+				}
+			]
     }
   ]
 }

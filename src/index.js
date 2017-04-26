@@ -2,7 +2,7 @@
 var Alexa = require('alexa-sdk');
 // var http = require('http');
 
-var APP_ID = undefined;
+var APP_ID = '';
 
 //CONSTANTS
 var letterNotPresent = 'That letter is not in there';
@@ -11,8 +11,11 @@ var letterPresentMoreThanOne = 'That letter is in the following spots: ';
 var victory = 'Congratulations, you got the word ';
 var loss = 'You guessed too many incorrect letters. The word was: ';
 var MAX_INCORRECT = 6;
-
-var randomWord = 'potato';
+var possibleWords = ['potato','truck','branch','wallet','mellon','kitty','program','store','peace','quarter',
+						'quick','polite','herd','fancy','fake','stealthy','arrows','phantom','chain','contest',
+						'smile','agenda','spell','dinner','humid','cube','thing','hamilton','paper','beehive',
+						'cuddly','bumble','jigsaw','fabric','beam','chant','pulse','empire','curse','apricot'];
+var randomWord;
 var lettersTried = [];
 var guessedSoFar;
 var incorrectGuesses = 0;
@@ -26,36 +29,42 @@ exports.handler = function(event, context, callback) {
 };
 
 var handlers = {
-	// 'NewSession': function() {
-// 		this.handler.state = states.STARTMODE;
-// 	},
-//     'LaunchRequest': function () {
-//         this.emit('NewSession');
-//     },
+    'LaunchRequest': function () {
+        startGame();
+		output = 'Welcome to hangman. Your word has ' + randomWord.length + ' letters';
+		this.emit(':ask', output, 'guess a letter or word');
+    },
     'CheckLetterIntent': function () {
-    	var letterGuess = this.event.request.intent.slots.letter.value;
-        startGameIfNotStarted();
-        checkForWin();
-        var indices = checkLetter(letterGuess[0].toLowerCase());
-        if (checkForLoss()){
-        	this.emit(':tell', loss + randomWord); 
-        }
-        else if (checkForWin()){
-        	incorrectGuesses = 0;
-        	gameStarted = false;
-        	this.emit(':tell', output, output);
-        }
-        else {
-        	if (indices.length === 0) {
+		var letterGuess = this.event.request.intent.slots.letter.value[0].toLowerCase();
+        startGame();
+		checkLetter(letterGuess);
+		if (checkForLoss()){
+			resetGame();
+			this.emit(':tell', loss + randomWord); 
+		} else if (checkForWin()) {
+			resetGame();
+			this.emit(':tell', output, output);
+		} else {
+			var indices = getIndicesOfLetterInWord(letterGuess)
+			if (indices.length === 0) {
 				setLetterNotPresentMessage();
 			} else {
 				setLetterPresentMessage(indices);
 			}
 			this.emit(':ask', output, 'guess another');
-        }
+		}
     },
     'CheckGuessIntent': function () {
-        this.emit(':ask', 'Hello World!');
+		var wordGuess = this.event.request.intent.slots.wordGuess.value;
+		console.log('word - ' + randomWord + ', guess - ' + wordGuess);
+		if (typeof randomWord == 'undefined') {
+			this.emit(':tell', 'You should start a game first.');
+		} else if (wordGuess == randomWord) {
+			resetGame();
+        	this.emit(':tell', victory + randomWord);
+		} else {
+			this.emit(':ask', 'keep guessing');
+		}
     },
     'SessionEndedRequest': function () {
         this.emit('AMAZON.StopIntent');
@@ -63,20 +72,27 @@ var handlers = {
 };
 
 //stars the game and initializes array to length
-function startGame(){
-	guessedSoFar = new Array(randomWord.length);
-	gameStarted = true;
-};
-
-//starts the game to persist it
-function startGameIfNotStarted(){
+function startGame() {
 	if (!gameStarted) {
-        	startGame();
-    }
+		randomWord = possibleWords[Math.floor(Math.random()*possibleWords.length)]
+		guessedSoFar = new Array(randomWord.length);
+		gameStarted = true;
+	}
+}
+
+//check if letter is in word and return indices
+function checkLetter(letter) {
+	var indices = getIndicesOfLetterInWord(letter);
+	if (indices.length === 0) {
+		incorrectGuesses++;
+	}
+	if (lettersTried.indexOf(letter) === -1) {
+		addTriedLetter(letter);
+	}
 }
 
 //get locations in the word where the given letter appears
-function getindicesOfLetterInWord(letter) {
+function getIndicesOfLetterInWord(letter) {
 	var indices = [];
 	for (var i = 0; i < randomWord.length; i++){
 		if (letter == randomWord.charAt(i)){
@@ -90,20 +106,6 @@ function getindicesOfLetterInWord(letter) {
 //add letters to array of tried letters
 function addTriedLetter(letter) {
 	lettersTried.push(letter);
-}
-
-//check if letter is in word and return indices
-function checkLetter(letter) {
-	console.log('checking for letter - ' + letter); 
-	var indices = getindicesOfLetterInWord(letter);
-	if (indices.length === 0) {
-		incorrectGuesses++;
-		console.log(incorrectGuesses + ' incorrect guesses'); 
-	}
-	if (lettersTried.indexOf(letter) === -1) {
-		addTriedLetter(letter);
-	}
-	return indices;
 }
 
 //returns if guess matches the random word
@@ -141,14 +143,14 @@ function checkForWin() {
 
 //sets letter present message whether one or more
 function setLetterPresentMessage(indices) {
-	output = letterPresent;
-    if (indices.length === 1){
-    	output = letterPresent + indices[0];
+    if (indices.length === 1) {
+    	output = letterPresent + indices[0] + ' of ' + randomWord.length;
     } else {
     	output = letterPresentMoreThanOne;
 		for (var i of indices) {
 			output += i + ', ';
 		}
+		output += ' of ' + randomWord.length; 
     }
 }
 
@@ -157,12 +159,8 @@ function setLetterNotPresentMessage() {
 	output = letterNotPresent;
 }
 
-
-//TODO - get random word from internet
-// http.get('http://randomword.setgetgo.com/get.php', function(res) {
-// 	var randomWord = res;
-// 	console.log(randomWord);
-// }, function(err) {
-// 	console.log('error', err);
-// });
-
+//resets values after winning a game
+function resetGame() {
+	gameStarted = false;
+	incorrectGuesses = 0;
+}
